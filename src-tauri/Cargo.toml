@@ -1,0 +1,39 @@
+[package]
+name = "boss-key"
+version = "0.1.0"
+description = "A lightweight system-tray boss key for Windows"
+authors = ["zayanshiekh"]
+edition = "2021"
+rust-version = "1.77"
+
+# The library that main.rs bootstraps. Named explicitly so the mobile/desktop
+# entrypoints can share it if the app ever grows beyond Windows.
+[lib]
+name = "boss_key_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = ["tray-icon"] }
+tauri-plugin-global-shortcut = "2"
+tauri-plugin-store = "2"
+tauri-plugin-autostart = "2"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+
+[target.'cfg(windows)'.dependencies]
+windows = { version = "0.58", features = [
+  "Win32_Foundation",
+  "Win32_UI_WindowsAndMessaging",
+  "Win32_System_Threading",
+] }
+
+[profile.release]
+# Optimise hard for size / low footprint — this is a tray utility.
+panic = "abort"
+codegen-units = 1
+lto = true
+opt-level = "s"
+strip = true
